@@ -10,11 +10,12 @@ import Combine
 import SwiftUI
 
 
-protocol NewsPublisher: ObservableObject {
-    var posts: [RedditPost] { get set }
+protocol NewsPublisher: ObservableObject where Item: Post {
+    associatedtype Item
+    var posts: [Item] { get set }
     var cursor: String { get set }
     func getPosts(after: String) -> Void
-    func getMorePostsIfNeeded(currentItem item: RedditPost?) -> Bool
+    func getMorePostsIfNeeded(currentItem item: Item?) -> Bool
 }
 
 final class RedditPublisher: NewsPublisher {
@@ -34,7 +35,7 @@ final class RedditPublisher: NewsPublisher {
         guard !isLoading else {
             return
         }
-        
+
         let url = URL(string: "\(RedditConstants.RedditAPI)\(after)")!
 
         cancellable = URLSession.shared.dataTaskPublisher(for: url)
